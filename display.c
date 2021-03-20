@@ -21,8 +21,8 @@ typedef struct {
     char lastName[15]; // account last name
     char firstName[10]; // account first name
     int  age;
-    int  idxHeader;
-    int  idxTemp;
+    int  indexHeader;
+    int  indexTemp;
 
     double balance; // account balance
 } Person;
@@ -38,8 +38,7 @@ typedef struct
     IndexKey	idxKey;
     char		appName[20];
     int			recCount;
-    int         idxHeader;
-    int     idxTemp;
+    int         indexTemp;
 } IndexHeader;
 
 // function prototypes
@@ -58,12 +57,10 @@ int main(int argc, char* argv[])
     int		writeCount;
     int		dataRecordCount;
     int		indexRecordCount;
-    int     idxHeader;
-    int     idxTemp;
     long	filePos;
 
     IndexHeader	indexHeader;
-    IndexRecord* indexRecords;
+    IndexRecord* indexTemp;
     Person		temp = { "","", 0 };
 
     indexKey = LAST;
@@ -101,10 +98,10 @@ if ((fpIndex = fopen("accounts.idx", "rb")) == NULL)
 recCount = fileSize(fpData) / sizeof(Person);
 
 // read header record in index file
-readCount = fread(&idxHeader, sizeof(IndexHeader), 1, fpIndex);
+readCount = fread(&indexHeader, sizeof(IndexHeader), 1, fpIndex);
 
 // check that application versions match
-if (strcmp(idxHeader.appName, APP_NAME) != 0)
+if (strcmp(indexHeader.appName, APP_NAME) != 0)
 {
     printf("ERROR - Data and Index Files Created by Different Application Versions\n");
     fclose(fpData);
@@ -113,7 +110,7 @@ if (strcmp(idxHeader.appName, APP_NAME) != 0)
 }
 
 // check that record count of data file matches index header
-if (idxHeader.recCount != recCount)
+if (indexHeader.recCount != recCount)
 {
     printf("ERROR - Data and Index Files Have a Record Count Mismatch\n");
     fclose(fpData);
@@ -126,14 +123,14 @@ printf("%-20s%-20s%6s\n", "First Name", "Last Name", "Age");
 printf("----------------------------------------------\n");
 
 // read first index record
-readCount = fread(&idxTemp, sizeof(IndexRecord), 1, fpIndex);
+readCount = fread(&indexTemp, sizeof(IndexRecord), 1, fpIndex);
 
 // continue processing all index records
 while ((!feof(fpIndex)) && (readCount == 1))
 {
     // seek record in data file based on file position
     //  stored in previously read index record
-    if (fseek(fpData, idxTemp.filePos, SEEK_SET) != 0)
+    if (fseek(fpData, indexTemp.filePos, SEEK_SET) != 0)
     {
         printf("Seek Error\n");
         fclose(fpData);
@@ -146,7 +143,7 @@ while ((!feof(fpIndex)) && (readCount == 1))
     printf("%-20s%-20s%6d\n", temp.firstName, temp.lastName, temp.age);
 
     // read next index record
-    readCount = fread(&idxTemp, sizeof(IndexRecord), 1, fpIndex);
+    readCount = fread(&indexTemp, sizeof(IndexRecord), 1, fpIndex);
 }
 
 // close files and go home
