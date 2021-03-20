@@ -31,6 +31,7 @@ typedef struct
 {
     KeyType		key;
     long		filePos;
+    int         indexTemp;
 } IndexRecord;
 
 typedef struct
